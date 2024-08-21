@@ -1,5 +1,5 @@
 
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import {
   getCurrentPositionAsync,
@@ -8,10 +8,12 @@ import {
   requestForegroundPermissionsAsync,
   watchPositionAsync} from 'expo-location'
 
-import { styles } from './styles';
+import { styles } from '../styles';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { StackTypes } from './Rotas';
+import { StackTypes } from '../Rotas';
+
+import { estabelecimentos } from '../utils/Estabelecimentos';
 
 export default function Mapa() {
 
@@ -66,15 +68,18 @@ export default function Mapa() {
             longitudeDelta: 0.005
           }}
         >
-          <Marker
+        {
+          estabelecimentos.map(estabelecimento => {
+            return <Marker
+            key={estabelecimento.id}
             pinColor={'#5d38e5'}
             coordinate={{
-              latitude: location.coords.latitude,
-              longitude:location.coords.longitude,
+              latitude: estabelecimento.latitude,
+              longitude:estabelecimento.longitude
             }}>
             <Callout onPress={navigationDetalhe}>
             <View style={{padding: 10, borderRadius: 10}}>
-              <Text>Lava Rapido Express</Text>
+              <Text>{estabelecimento.nome}</Text>
               <View
                 style={{
                   backgroundColor: '#5d38e5',  
@@ -88,8 +93,29 @@ export default function Mapa() {
             </View>
             </Callout>  
           </Marker>
-        </MapView>
+
+          })
+        }
+        </MapView>        
       }
+      <View style={{ position: 'absolute', top: 10, width: '95%' }}>
+      <TextInput
+        style={{
+          borderRadius: 10,
+          margin: 10,
+          color: '#000',
+          borderColor: '#666',
+          backgroundColor: '#FFF',
+          borderWidth: 1,
+          height: 45,
+          paddingHorizontal: 10,
+          fontSize: 18,
+        }}
+        placeholder={'Pesquisar Lava Rápido...'}
+        placeholderTextColor={'#666'}
+      />
+    </View>
+
     </View>
   );
 }
