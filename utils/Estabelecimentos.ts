@@ -1,4 +1,4 @@
-const estabelecimentos = [
+const reponse = [
     {
         id: 1,
         nome: 'Lava Jato Express',
@@ -9,7 +9,7 @@ const estabelecimentos = [
         id: 2,
         nome: 'Lava Rapido Express',
         latitude: -22.60023164782598,
-        longitude: -47.39588615222428
+        longitude: -47.39588615222428        
     },
     {
         id: 3,
@@ -22,7 +22,8 @@ const estabelecimentos = [
         nome: 'Lava Gato a Jato',
         latitude: -22.587024634253908,
         longitude: -47.40029467633376
+        
     }
 ]
 
-export { estabelecimentos }
+export { reponse }
