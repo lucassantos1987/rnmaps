@@ -1,5 +1,5 @@
 
-import { View, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Keyboard, Image } from 'react-native';
 import MapView, { Callout, LatLng, Marker } from 'react-native-maps';
 import {
   getCurrentPositionAsync,
@@ -13,16 +13,16 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StackTypes } from '../Rotas';
 
-import { reponse } from '../utils/Estabelecimentos';
+import { response } from '../utils/Estabelecimentos';
 
 export default function Mapa() {
 
   const[location, setLocation] = useState<LocationObject | null>(null);
-  const[estabelecimento, setEstabelecimento] = useState(reponse);
+  const[estabelecimento, setEstabelecimento] = useState(response);
   const[pesquisar, setPesquisar] = useState('');
 
   useEffect(() => {
-    setEstabelecimento(reponse);
+    setEstabelecimento(response);
   }, [])
 
   const mapRef = useRef<MapView>(null);
@@ -31,6 +31,26 @@ export default function Mapa() {
 
   function navigationDetalhe() {
     navigation.navigate("Detalhe");
+  }
+
+  function posicaoAtual() {
+    watchPositionAsync({
+      accuracy: LocationAccuracy.Highest,
+      timeInterval: 1000,
+      distanceInterval: 1
+    }, (response) => {
+      setLocation(response);
+      mapRef.current?.animateCamera({
+        //pitch: 70, // coloca o mapa em perspectiva
+        center: response.coords
+      })
+    });
+  }
+
+  function resetarMapa() {
+    setPesquisar('');
+    setEstabelecimento(response);
+    posicaoAtual();
   }
 
   function pesquisarEstabelecimento() {
@@ -56,8 +76,6 @@ export default function Mapa() {
         animated: true
       })
       Keyboard.dismiss();
-    } else {
-      setEstabelecimento(reponse);
     }
   }
 
@@ -75,17 +93,7 @@ export default function Mapa() {
   }, []);
 
   useEffect(() => {
-    watchPositionAsync({
-      accuracy: LocationAccuracy.Highest,
-      timeInterval: 1000,
-      distanceInterval: 1
-    }, (response) => {
-      setLocation(response);
-      mapRef.current?.animateCamera({
-        //pitch: 70, // coloca o mapa em perspectiva
-        center: response.coords
-      })
-    });
+    posicaoAtual();
   }, [])
 
   return (
@@ -102,6 +110,11 @@ export default function Mapa() {
             longitudeDelta: 0.005
           }}          
         >
+          <Marker
+            coordinate={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude
+            }}></Marker>          
         {
           estabelecimento.map(estabelecimento => {
             return <Marker
@@ -110,12 +123,14 @@ export default function Mapa() {
             coordinate={{
               latitude: estabelecimento.latitude,
               longitude:estabelecimento.longitude
-            }}>  
+            }}>
+            <Image source={require('../assets/icons8-lavagem-automática-de-automóveis-48.png')} />
             <Callout onPress={navigationDetalhe}>
-            <View style={{padding: 10, borderRadius: 10}}>
-              <Text>{estabelecimento.nome}</Text>
+            <View style={{padding: 10, borderRadius: 10, width: 180, alignItems: 'center', justifyContent: 'center'}}>
+            <Text>{estabelecimento.nome}</Text>
               <View
                 style={{
+                  width: '100%',
                   backgroundColor: '#5d38e5',  
                   marginTop: 10, 
                   alignItems: 'center', 
@@ -132,12 +147,12 @@ export default function Mapa() {
         }
         </MapView>        
       }
-      <View style={{ position: 'absolute', top: 10, width: '95%', flexDirection:'row' }}>
+      <View style={{ position: 'absolute', top: 10, width: '100%', backgroundColor: '#FFF', height: 125, borderBottomColor: '#D6CECE', borderBottomWidth: 1}}>
         <TextInput
           value={pesquisar}
           onChangeText={(text) => setPesquisar(text)}
           style={{
-            width: '78%',
+            width: '95%',
             height: 45,
             borderRadius: 10,
             margin: 10,
@@ -151,11 +166,18 @@ export default function Mapa() {
           placeholder={'Pesquisar Lava Rápido...'}
           placeholderTextColor={'#666'}
         />
+        <View style={{ flexDirection: 'row'}}>
         <TouchableOpacity 
-          onPress={pesquisarEstabelecimento}
-          style={{ marginTop: 10, marginLeft: 0, width: '15%', height: 45, backgroundColor: '#5d38e5', alignItems: 'center', justifyContent: 'center', borderRadius: 10}}>
-          <Text style={{ color: '#FFF', fontSize: 20}}>P</Text>
-        </TouchableOpacity>
+            onPress={pesquisarEstabelecimento}
+            style={{ marginLeft: 15, width: '45%', height: 45, backgroundColor: '#5d38e5', alignItems: 'center', justifyContent: 'center', borderRadius: 10}}>
+            <Text style={{ color: '#FFF', fontSize: 20}}>Pesquisar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={resetarMapa}
+            style={{ marginLeft: 10, width: '45%', height: 45, backgroundColor: '#5d38e5', alignItems: 'center', justifyContent: 'center', borderRadius: 10}}>
+            <Text style={{ color: '#FFF', fontSize: 20}}>Limpar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

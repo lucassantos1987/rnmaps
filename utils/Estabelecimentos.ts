@@ -1,4 +1,4 @@
-const reponse = [
+const response = [
     {
         id: 1,
         nome: 'Lava Jato Express',
@@ -26,4 +26,4 @@ const reponse = [
     }
 ]
 
-export { reponse }
+export { response }
