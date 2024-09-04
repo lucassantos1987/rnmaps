@@ -1,6 +1,6 @@
 import { Box, FormControl, Input, ScrollView } from "native-base";
-import { SetStateAction, useState } from "react";
-import { Text, TextInput, TouchableOpacity } from "react-native";
+import { useState } from "react";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 const i_cep = require('awesome-cep');
 
@@ -18,15 +18,38 @@ export default function LavaRapido() {
 
     function retornarEnderecoCep() {
         if (cep != "") {
-            i_cep.findCEP(cep).then((response: { address_name: SetStateAction<string>; }) => {
-                setEndereco(response.address_name)
-            })            
+            i_cep.findCEP(cep)
+            .then((response: { 
+                    address_name: string; 
+                    district: string;
+                    city: string;
+                    state: string;
+                    lat: string;
+                    lng: string;}) => {
+                setEndereco(response.address_name);
+                setBairro(response.district);
+                setCidade(response.city);
+                setEstado(response.state);
+                setLatitude(response.lat);
+                setLongitude(response.lng)
+            })
+            .catch((error: any) => {
+                setEndereco('');
+                setBairro('');
+                setCidade('');
+                setEstado('');
+                setLatitude('');
+                setLongitude('');
+                Alert.alert(error.message);                
+            })
         }
     }
 
     return (
         <ScrollView flex={1} padding={5}>
-            <Text>Faça seu cadastro!!</Text>
+            <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={{ fontSize: 22, fontWeight: 'bold' }}>Faça seu cadastro</Text>
+            </View>
 
             <Box paddingBottom={10}>
                 <FormControl marginTop={5}>
@@ -34,6 +57,8 @@ export default function LavaRapido() {
                     <Input
                         placeholder="Nome da empresa"
                         width={"100%"}
+                        size={"md"}
+                        textTransform={"uppercase"}
                         borderRadius={10}
                         value={nome}
                         onChangeText={(text) => setNome(text)}
@@ -44,6 +69,7 @@ export default function LavaRapido() {
                     <Input
                         placeholder="Informe o cep"
                         width={"100%"}
+                        size={"lg"}
                         borderRadius={10}
                         maxLength={8}
                         keyboardType={'numeric'}
@@ -52,6 +78,7 @@ export default function LavaRapido() {
                     />
                 </FormControl>
                 <TouchableOpacity
+                    onPress={retornarEnderecoCep}
                     style={{marginTop: 10,  width: '100%', height: 50, backgroundColor: '#5d38e5', alignItems: 'center', justifyContent: 'center', borderRadius: 10}}>
                     <Text style={{ color: '#FFF', fontSize: 16}}>Pesquisar Cep</Text>
                 </TouchableOpacity>
@@ -60,8 +87,10 @@ export default function LavaRapido() {
                     <Input
                         placeholder="Endereço"
                         width={"100%"}
+                        size={"md"}
+                        textTransform={"uppercase"}
                         borderRadius={10}
-                        maxLength={8}
+                        maxLength={100}
                         keyboardType={'numeric'}
                         value={endereco}
                         onChangeText={(text) => setCep(text)}
@@ -72,6 +101,7 @@ export default function LavaRapido() {
                     <Input
                         placeholder="Número"
                         width={"100%"}
+                        size={"lg"}
                         borderRadius={10}
                         maxLength={8}
                         keyboardType={'numeric'}
@@ -84,8 +114,10 @@ export default function LavaRapido() {
                     <Input
                         placeholder="Bairro"
                         width={"100%"}
+                        size={"md"}
+                        textTransform={"uppercase"}
                         borderRadius={10}
-                        maxLength={8}
+                        maxLength={60}
                         keyboardType={'numeric'}
                         value={bairro}
                         onChangeText={(text) => setCep(text)}
@@ -96,8 +128,10 @@ export default function LavaRapido() {
                     <Input
                         placeholder="Cidade"
                         width={"100%"}
+                        size={"md"}
+                        textTransform={"uppercase"}
                         borderRadius={10}
-                        maxLength={8}
+                        maxLength={60}
                         keyboardType={'numeric'}
                         value={cidade}
                         onChangeText={(text) => setCep(text)}
@@ -109,8 +143,10 @@ export default function LavaRapido() {
                         marginLeft={0}
                         placeholder="Estado"
                         width={"100%"}
+                        size={"md"}
+                        textTransform={"uppercase"}
                         borderRadius={10}
-                        maxLength={8}
+                        maxLength={2}
                         keyboardType={'numeric'}
                         value={estado}
                         onChangeText={(text) => setCep(text)}
